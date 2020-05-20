@@ -103,6 +103,26 @@ class CocaidoPackmanTests: XCTestCase {
         XCTAssertEqual(sut.output(), expectedViewModel)
     }
     
+    func testMoveHeroToUpDoesNotGoThroughWall() {
+        let hero = Hero(position: .init(x: 1, y: 4))
+        let sut = Game(hero: hero)
+        
+        sut.moveHero(direction: .up)
+        let expectedViewModel = GameViewModel(heroPosition: .init(x: 1, y: 4))
+       
+        XCTAssertEqual(sut.output(), expectedViewModel)
+    }
+    
+    func testMoveHeroToDownDoesNotGoThroughWall() {
+        let hero = Hero(position: .init(x: 1, y: 0))
+        let sut = Game(hero: hero)
+        
+        sut.moveHero(direction: .down)
+        let expectedViewModel = GameViewModel(heroPosition: .init(x: 1, y: 0))
+       
+        XCTAssertEqual(sut.output(), expectedViewModel)
+    }
+    
     func testMoveHeroToLeftDoesGoBehindBounds() {
         let hero = Hero(position: .init(x: 0, y: 0))
         let sut = Game(hero: hero)
@@ -179,9 +199,11 @@ class Game {
         
         switch direction {
         case .up:
-            return coordinate.moveUp()
+            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveUp)
+            return usecase(board, 0) ?? coordinate
         case .down:
-            return coordinate.moveDown(max: boardSize.height)
+            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveDown)
+            return usecase(board, boardSize.height) ?? coordinate
         case .left:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveLeft)
             return usecase(board, 0) ?? coordinate
@@ -196,7 +218,7 @@ class Game {
         return { board, boundIndex in
             return board.area
                 .filter({ tile -> Bool in
-                    if tile.x == action(tile, boundIndex).x && tile.y == heroCoordinate.y {
+                    if tile.x == action(tile, boundIndex).x && tile.y == action(tile, boundIndex).y {
                         return true
                     }
                     return false
@@ -228,15 +250,15 @@ struct Hero {
 struct Coordinate: Equatable {
     var x, y: Int
     
-    func moveUp() -> Coordinate {
-        if y != 0 {
+    func moveUp(from tileAboveOfPos: Tile, boundIndex: Int) -> Coordinate {
+        if y != boundIndex && !tileAboveOfPos.isWallTile {
             return Coordinate(x: x, y: y - 1)
         }
         return self
     }
     
-    func moveDown(max: Int) -> Coordinate {
-        if y != max - 1 {
+    func moveDown(from tileBelowOfPos: Tile, boundIndex: Int) -> Coordinate {
+        if y < boundIndex && !tileBelowOfPos.isWallTile {
             return Coordinate(x: x, y: y + 1)
         }
         return self
@@ -249,8 +271,8 @@ struct Coordinate: Equatable {
         return self
     }
     
-    func moveRight(from tileLeftOfPos: Tile, boundIndex: Int) -> Coordinate {
-        if x < boundIndex && !tileLeftOfPos.isWallTile {
+    func moveRight(from tileRightOfPos: Tile, boundIndex: Int) -> Coordinate {
+        if x < boundIndex && !tileRightOfPos.isWallTile {
             return Coordinate(x: x + 1, y: y)
         }
         return self
