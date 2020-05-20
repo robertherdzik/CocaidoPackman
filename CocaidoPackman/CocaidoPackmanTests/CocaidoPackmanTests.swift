@@ -173,7 +173,7 @@ struct Tile {
 }
 
 struct Board {
-    let area: [Tile]
+    private let area: [Tile]
     private let boardSize = BoardSize(width: 10, height: 10)
     var minX: Int { 0 }
     var maxX: Int { boardSize.width }
@@ -200,6 +200,10 @@ struct Board {
             tile.isWallTile = true
         }
         return tile
+    }
+    
+    func filteringTiles(_ filter: (Tile) -> Bool) -> [Tile] {
+        area.filter(filter)
     }
 }
 
@@ -241,13 +245,12 @@ class Game {
     private func canHeroMove(heroCoordinate: Coordinate,
                              action: @escaping (Tile, _ boundIndex: Int) -> Coordinate) -> (Board, _ boundIndex: Int) -> Coordinate? {
         return { board, boundIndex in
-            return board.area
-                .filter({ tile -> Bool in
-                    if tile.x == action(tile, boundIndex).x && tile.y == action(tile, boundIndex).y {
-                        return true
-                    }
-                    return false
-                }).map { Coordinate(x: $0.x, y: $0.y) }.first
+            return board.filteringTiles { tile in
+                if tile.x == action(tile, boundIndex).x && tile.y == action(tile, boundIndex).y {
+                    return true
+                }
+                return false
+            }.map { Coordinate(x: $0.x, y: $0.y) }.first
         }
     }
     
