@@ -174,6 +174,33 @@ struct Tile {
 
 struct Board {
     let area: [Tile]
+    let boardSize = BoardSize(width: 10, height: 10)
+    var minX: Int { 0 }
+    var maxX: Int { boardSize.width }
+    var minY: Int { 0 }
+    var maxY: Int { boardSize.height }
+    
+    init(wallCoordinates: [Coordinate] = [Coordinate(x: 1, y: 1),
+                                          Coordinate(x: 1, y: 2),
+                                          Coordinate(x: 1, y: 3)]) {
+        var tiles = [Tile]()
+        for xIndex in 0..<boardSize.width {
+            for yIndex in 0..<boardSize.height {
+                let tile = Board.tile(for: .init(x: xIndex, y: yIndex), wallCoordinates: wallCoordinates)
+                tiles.append(tile)
+            }
+        }
+        
+        area = tiles
+    }
+    
+    private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
+        var tile = Tile(x: coordinate.x, y: coordinate.y)
+        if wallCoordinates.contains(coordinate) {
+            tile.isWallTile = true
+        }
+        return tile
+    }
 }
 
 struct BoardSize {
@@ -182,8 +209,7 @@ struct BoardSize {
 }
 
 class Game {
-    private var board: Board!
-    private let boardSize: BoardSize = BoardSize(width: 10, height: 10)
+    private var board = Board()
     private let hero: Hero
     private var viewModel: GameViewModel
     
@@ -191,27 +217,6 @@ class Game {
         self.hero = hero
         let heroPosition = hero.position
         viewModel = GameViewModel(heroPosition: .init(x: heroPosition.x, y: heroPosition.y))
-        makeBoard()
-    }
-    
-    private func makeBoard() {
-        var tiles = [Tile]()
-        
-        let wallCoordinates = [Coordinate(x: 1, y: 1),
-                               Coordinate(x: 1, y: 2),
-                               Coordinate(x: 1, y: 3)]
-        
-        for i in 0..<boardSize.width {
-            for j in 0..<boardSize.height {
-                var tile = Tile(x: i, y: j)
-                let currentCoordinate = Coordinate(x: i, y: j)
-                if wallCoordinates.contains(currentCoordinate) {
-                    tile.isWallTile = true
-                }
-                tiles.append(tile)
-            }
-        }
-        board = Board(area: tiles)
     }
     
     private func moveTo(_ direction: Direction) -> Coordinate {
@@ -220,16 +225,16 @@ class Game {
         switch direction {
         case .up:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveUp)
-            return usecase(board, 0) ?? coordinate
+            return usecase(board, board.minY) ?? coordinate
         case .down:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveDown)
-            return usecase(board, boardSize.height) ?? coordinate
+            return usecase(board, board.maxY) ?? coordinate
         case .left:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveLeft)
-            return usecase(board, 0) ?? coordinate
+            return usecase(board, board.minX) ?? coordinate
         case .right:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveRight)
-            return usecase(board, boardSize.width) ?? coordinate
+            return usecase(board, board.maxX) ?? coordinate
         }
     }
     
