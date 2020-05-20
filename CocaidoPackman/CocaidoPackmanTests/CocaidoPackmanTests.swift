@@ -174,7 +174,7 @@ struct Tile {
 
 struct Board {
     let area: [Tile]
-    let boardSize = BoardSize(width: 10, height: 10)
+    private let boardSize = BoardSize(width: 10, height: 10)
     var minX: Int { 0 }
     var maxX: Int { boardSize.width }
     var minY: Int { 0 }
