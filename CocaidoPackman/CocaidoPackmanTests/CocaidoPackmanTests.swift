@@ -164,18 +164,10 @@ class Game {
             return coordinate.moveDown(max: boardSize.height)
         case .left:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveLeft)
-            let tileLeftOfPos = usecase(board, 0)
-            if let tileLeftOfPos = tileLeftOfPos {
-                return coordinate.moveLeft(from: Tile(x: tileLeftOfPos.x, y: tileLeftOfPos.x), boundIndex: 0)
-            }
-            return coordinate
+            return usecase(board, 0) ?? coordinate
         case .right:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveRight)
-            let tileRightOfPos = usecase(board, boardSize.width)
-            if let tileRightOfPos = tileRightOfPos {
-                return coordinate.moveRight(from: Tile(x: tileRightOfPos.x, y: tileRightOfPos.x), boundIndex: boardSize.width)
-            }
-            return coordinate
+            retur©n usecase(board, boardSize.width) ?? coordinate
         }
     }
     
