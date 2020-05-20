@@ -168,6 +168,10 @@ class CocaidoPackmanTests: XCTestCase {
         
         XCTAssertEqual(sut.cookiesTilesCount, sut.tilesCount - sut.wallTilesCount)
     }
+    
+    func testHeroCanEatCookies() {
+        #warning("TODO: @machipla, 20/05/2020, Finish eating test, after t that making a type inside the tile") 
+    }
 }
 
 //------------------------------------------------
