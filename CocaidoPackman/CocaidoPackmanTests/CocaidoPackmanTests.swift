@@ -92,6 +92,16 @@ class CocaidoPackmanTests: XCTestCase {
        
         XCTAssertEqual(sut.output(), expectedViewModel)
     }
+    
+    func testMoveHeroToRightDoesNotGoThroughWall() {
+        let hero = Hero(position: .init(x: 0, y: 1))
+        let sut = Game(hero: hero)
+        
+        sut.moveHero(direction: .right)
+        let expectedViewModel = GameViewModel(heroPosition: .init(x: 0, y: 1))
+       
+        XCTAssertEqual(sut.output(), expectedViewModel)
+    }
 }
 
 //------------------------------------------------
@@ -167,7 +177,19 @@ class Game {
             }
             return coordinate
         case .right:
-            return coordinate.moveRight(max: boardSize.width)
+            let tileRightOfPos = board.area
+                .filter({ tile -> Bool in
+                    if tile.x == coordinate.x + 1 && tile.y == coordinate.y {
+                        return true
+                    }
+                    return false
+                })
+                .first
+            
+            if let tileRightOfPos = tileRightOfPos {
+                return coordinate.moveRight(from: tileRightOfPos, max: boardSize.width)
+            }
+            return coordinate
         }
     }
     
@@ -216,8 +238,8 @@ struct Coordinate: Equatable {
         return self
     }
     
-    func moveRight(max: Int) -> Coordinate {
-        if x != max - 1 {
+    func moveRight(from tileLeftOfPos: Tile, max: Int) -> Coordinate {
+        if x < max && !tileLeftOfPos.isWallTile {
             return Coordinate(x: x + 1, y: y)
         }
         return self
