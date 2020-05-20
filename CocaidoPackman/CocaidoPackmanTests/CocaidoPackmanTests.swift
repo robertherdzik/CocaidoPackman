@@ -102,6 +102,26 @@ class CocaidoPackmanTests: XCTestCase {
        
         XCTAssertEqual(sut.output(), expectedViewModel)
     }
+    
+    func testMoveHeroToLeftDoesGoBehindBounds() {
+        let hero = Hero(position: .init(x: 0, y: 0))
+        let sut = Game(hero: hero)
+        
+        sut.moveHero(direction: .left)
+        let expectedViewModel = GameViewModel(heroPosition: .init(x: 0, y: 0))
+       
+        XCTAssertEqual(sut.output(), expectedViewModel)
+    }
+    
+    func testMoveHeroToRightDoesGoBehindBounds() {
+        let hero = Hero(position: .init(x: 9, y: 0))
+        let sut = Game(hero: hero)
+        
+        sut.moveHero(direction: .right)
+        let expectedViewModel = GameViewModel(heroPosition: .init(x: 9, y: 0))
+       
+        XCTAssertEqual(sut.output(), expectedViewModel)
+    }
 }
 
 //------------------------------------------------
