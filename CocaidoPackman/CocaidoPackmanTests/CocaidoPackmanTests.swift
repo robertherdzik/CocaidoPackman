@@ -163,33 +163,32 @@ class Game {
         case .down:
             return coordinate.moveDown(max: boardSize.height)
         case .left:
-            let tileLeftOfPos = board.area
-                .filter({ tile -> Bool in
-                    if tile.x == coordinate.x - 1 && tile.y == coordinate.y {
-                        return true
-                    }
-                    return false
-                })
-                .first
-            
+            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveLeft)
+            let tileLeftOfPos = usecase(board, 0)
             if let tileLeftOfPos = tileLeftOfPos {
-               return coordinate.moveLeft(from: tileLeftOfPos)
+                return coordinate.moveLeft(from: Tile(x: tileLeftOfPos.x, y: tileLeftOfPos.x), boundIndex: 0)
             }
             return coordinate
         case .right:
-            let tileRightOfPos = board.area
+            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveRight)
+            let tileRightOfPos = usecase(board, boardSize.width)
+            if let tileRightOfPos = tileRightOfPos {
+                return coordinate.moveRight(from: Tile(x: tileRightOfPos.x, y: tileRightOfPos.x), boundIndex: boardSize.width)
+            }
+            return coordinate
+        }
+    }
+    
+    private func canHeroMove(heroCoordinate: Coordinate,
+                             action: @escaping (Tile, _ boundIndex: Int) -> Coordinate) -> (Board, _ boundIndex: Int) -> Coordinate? {
+        return { board, boundIndex in
+            return board.area
                 .filter({ tile -> Bool in
-                    if tile.x == coordinate.x + 1 && tile.y == coordinate.y {
+                    if tile.x == action(tile, boundIndex).x && tile.y == heroCoordinate.y {
                         return true
                     }
                     return false
-                })
-                .first
-            
-            if let tileRightOfPos = tileRightOfPos {
-                return coordinate.moveRight(from: tileRightOfPos, max: boardSize.width)
-            }
-            return coordinate
+                }).map { Coordinate(x: $0.x, y: $0.y) }.first
         }
     }
     
@@ -231,15 +230,15 @@ struct Coordinate: Equatable {
         return self
     }
     
-    func moveLeft(from tileLeftOfPos: Tile) -> Coordinate {
-        if x != 0 && !tileLeftOfPos.isWallTile {
+    func moveLeft(from tileLeftOfPos: Tile, boundIndex: Int) -> Coordinate {
+        if x != boundIndex && !tileLeftOfPos.isWallTile {
             return Coordinate(x: x - 1, y: y)
         }
         return self
     }
     
-    func moveRight(from tileLeftOfPos: Tile, max: Int) -> Coordinate {
-        if x < max && !tileLeftOfPos.isWallTile {
+    func moveRight(from tileLeftOfPos: Tile, boundIndex: Int) -> Coordinate {
+        if x < boundIndex && !tileLeftOfPos.isWallTile {
             return Coordinate(x: x + 1, y: y)
         }
         return self
