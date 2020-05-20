@@ -167,7 +167,7 @@ class Game {
             return usecase(board, 0) ?? coordinate
         case .right:
             let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveRight)
-            retur©n usecase(board, boardSize.width) ?? coordinate
+            return usecase(board, boardSize.width) ?? coordinate
         }
     }
     
