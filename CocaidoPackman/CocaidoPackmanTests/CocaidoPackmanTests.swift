@@ -162,6 +162,12 @@ class CocaidoPackmanTests: XCTestCase {
        
         XCTAssertEqual(sut.output(), expectedViewModel)
     }
+    
+    func testBoardHaveCookiesOnNonWallTiles() {
+        let sut = Board()
+        
+        XCTAssertEqual(sut.cookiesTilesCount, sut.tilesCount - sut.wallTilesCount)
+    }
 }
 
 //------------------------------------------------
@@ -169,6 +175,7 @@ class CocaidoPackmanTests: XCTestCase {
 
 struct Tile {
     var isWallTile = false
+    var isCookie = false
     let x, y: Int
 }
 
@@ -179,6 +186,9 @@ struct Board {
     var maxX: Int { boardSize.width }
     var minY: Int { 0 }
     var maxY: Int { boardSize.height }
+    var cookiesTilesCount: Int { area.filter { $0.isCookie }.count }
+    var tilesCount: Int { area.count }
+    var wallTilesCount: Int { area.filter { $0.isWallTile }.count }
     
     init(wallCoordinates: [Coordinate] = [Coordinate(x: 1, y: 1),
                                           Coordinate(x: 1, y: 2),
@@ -196,9 +206,9 @@ struct Board {
     
     private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
         var tile = Tile(x: coordinate.x, y: coordinate.y)
-        if wallCoordinates.contains(coordinate) {
-            tile.isWallTile = true
-        }
+        tile.isWallTile = wallCoordinates.contains(coordinate)
+        tile.isCookie = !tile.isWallTile
+        
         return tile
     }
     
