@@ -364,4 +364,18 @@ struct GameViewModel: Equatable {
  Packman
  - move up/down/right/left
  - position
+ 
+ Issues / Refactoring stuff:
+ Calling `self.consumeCookieIfPossible(tile: tile)` in 287 line, not a single responsability method
+ Tile x and y position could be an coordinate values
+ Tile isWallTile and isCookie coud be part of an enum
+ `func cookiesTilesInBoardCount() -> Int` should not be part of the game
+ We should look for the score in the game instead of counting cookies
+ Having a method to create the board and not having all in the init
+ Move the boardSize property in board and use the constant or something different to make it cleaner
+ Replace at index instead of creating a new area in `eatCookie` method
+ Make `canHeroMove(heroCoordinate:` methos easy to read and simple
+ Can we remove Hero struct?
+ 
  */
+
