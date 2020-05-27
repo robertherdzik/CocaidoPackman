@@ -170,22 +170,35 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testHeroCanEatCookies() {
-        #warning("TODO: @machipla, 20/05/2020, Finish eating test, after t that making a type inside the tile") 
+        let hero = Hero(position: .init(x: 0, y: 0))
+        let sut = Game(hero: hero)
+        let cookiesTilesCountBeforeMovement = sut.cookiesTilesInBoardCount()
+
+        sut.moveHero(direction: .right)
+        let cookiesTilesCountAfterMovement = sut.cookiesTilesInBoardCount()
+        XCTAssertEqual(cookiesTilesCountBeforeMovement - 1, cookiesTilesCountAfterMovement)
     }
 }
 
 //------------------------------------------------
 // _TODO [🌶]: implementation
 
-struct Tile {
+struct Tile: Equatable {
     var isWallTile = false
     var isCookie = false
     let x, y: Int
+    
+    func eat() -> Tile {
+        Tile(isWallTile: isWallTile, isCookie: false, x: x, y: y)
+    }
 }
 
 struct Board {
-    private let area: [Tile]
-    private let boardSize = BoardSize(width: 10, height: 10)
+    private var area: [Tile]
+    enum Constant {
+        static let boardSize = BoardSize(width: 10, height: 10)
+    }
+    private let boardSize = Constant.boardSize
     var minX: Int { 0 }
     var maxX: Int { boardSize.width }
     var minY: Int { 0 }
@@ -198,14 +211,14 @@ struct Board {
                                           Coordinate(x: 1, y: 2),
                                           Coordinate(x: 1, y: 3)]) {
         var tiles = [Tile]()
-        for xIndex in 0..<boardSize.width {
-            for yIndex in 0..<boardSize.height {
+        for xIndex in 0..<Constant.boardSize.width {
+            for yIndex in 0..<Constant.boardSize.height {
                 let tile = Board.tile(for: .init(x: xIndex, y: yIndex), wallCoordinates: wallCoordinates)
                 tiles.append(tile)
             }
         }
         
-        area = tiles
+        self.area = tiles
     }
     
     private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
@@ -219,6 +232,15 @@ struct Board {
     func filteringTiles(_ filter: (Tile) -> Bool) -> [Tile] {
         area.filter(filter)
     }
+    
+    mutating func eatCookie(at tile: Tile) {
+        var area = self.area
+        guard tile.isCookie, let tileToReplace = area.filter({ $0 == tile }).first, let index = area.firstIndex(of: tileToReplace) else {
+            return
+        }
+        area[index] = tileToReplace.eat()
+        self.area = area
+    }
 }
 
 struct BoardSize {
@@ -227,12 +249,13 @@ struct BoardSize {
 }
 
 class Game {
-    private var board = Board()
+    private var board: Board
     private let hero: Hero
     private var viewModel: GameViewModel
     
-    init(hero: Hero) {
+    init(hero: Hero, board: Board = Board()) {
         self.hero = hero
+        self.board = board
         let heroPosition = hero.position
         viewModel = GameViewModel(heroPosition: .init(x: heroPosition.x, y: heroPosition.y))
     }
@@ -261,11 +284,16 @@ class Game {
         return { board, boundIndex in
             return board.filteringTiles { tile in
                 if tile.x == action(tile, boundIndex).x && tile.y == action(tile, boundIndex).y {
+                    self.consumeCookieIfPossible(tile: tile)
                     return true
                 }
                 return false
             }.map { Coordinate(x: $0.x, y: $0.y) }.first
         }
+    }
+    
+    private func consumeCookieIfPossible(tile: Tile) {
+        board.eatCookie(at: tile)
     }
     
     func moveHero(direction: Direction) {
@@ -276,6 +304,10 @@ class Game {
     
     func output() -> GameViewModel {
         viewModel
+    }
+    
+    func cookiesTilesInBoardCount() -> Int {
+        board.cookiesTilesCount
     }
 }
 
