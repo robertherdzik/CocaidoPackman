@@ -218,6 +218,11 @@ struct Bounds {
     var maxY: Int
 }
 
+struct BoardSize {
+    let width: Int
+    let height: Int
+}
+
 struct Board {
     private var area: [Tile]
     enum Constant {
@@ -278,11 +283,6 @@ struct Board {
     }
 }
 
-struct BoardSize {
-    let width: Int
-    let height: Int
-}
-
 class Game {
     private var board: Board
     private let hero: Hero
@@ -294,8 +294,6 @@ class Game {
         let heroPosition = hero.position
         viewModel = GameViewModel(heroPosition: heroPosition.coordinate)
     }
-    
-   
     
     private func moveTo(_ direction: Direction) -> Coordinate {
         let coordinate = viewModel.heroPosition
@@ -391,8 +389,7 @@ struct GameViewModel: Equatable {
 
 /*
  Issues / Refactoring stuff:
- 
- Move the boardSize property in board and use the constant or something different to make it cleaner
+
  Replace at index instead of creating a new area in `eatCookie` method
  Can we remove Hero struct or refactor it?
  
