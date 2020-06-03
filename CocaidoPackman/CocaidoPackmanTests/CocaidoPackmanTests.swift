@@ -184,13 +184,29 @@ class CocaidoPackmanTests: XCTestCase {
 // _TODO [🌶]: implementation
 
 struct Tile: Equatable {
-    var isWallTile = false
-    var isCookie = false
+    enum Kind {
+        case wall
+        case cookie
+        case empty
+    }
+    
+    let type: Kind
     let coordinate: Coordinate
+    var isCookie: Bool {
+        type == .cookie
+    }
+    var isWall: Bool {
+        type == .wall
+    }
+    
+    init(type: Kind = .empty,
+         coordinate: Coordinate) {
+        self.type = type
+        self.coordinate = coordinate
+    }
     
     func eat() -> Tile {
-        Tile(isWallTile: isWallTile,
-             isCookie: false,
+        Tile(type: .empty,
              coordinate: coordinate)
     }
 }
@@ -214,7 +230,7 @@ struct Board {
     }
     var cookiesTilesCount: Int { area.filter { $0.isCookie }.count }
     var tilesCount: Int { area.count }
-    var wallTilesCount: Int { area.filter { $0.isWallTile }.count }
+    var wallTilesCount: Int { area.filter { $0.isWall }.count }
     
     init(wallCoordinates: [Coordinate] = [Coordinate(x: 1, y: 1),
                                           Coordinate(x: 1, y: 2),
@@ -231,11 +247,11 @@ struct Board {
     }
     
     private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
-        var tile = Tile(coordinate: coordinate)
-        tile.isWallTile = wallCoordinates.contains(coordinate)
-        tile.isCookie = !tile.isWallTile
+        if wallCoordinates.contains(coordinate) {
+            return Tile(type: .wall, coordinate: coordinate)
+        }
         
-        return tile
+        return Tile(type: .cookie, coordinate: coordinate)
     }
     
     func filteringTiles(_ filter: (Tile) -> Bool) -> [Tile] {
@@ -281,7 +297,7 @@ class Game {
                                                      bounds: board.bounds)
         
         return board.filteringTiles {
-            $0.coordinate == coordinateAction($0.isWallTile, board.bounds)
+            $0.coordinate == coordinateAction($0.isWall, board.bounds)
         }.map { $0.coordinate }.first ?? coordinate
     }
     
@@ -290,9 +306,8 @@ class Game {
         
         if let tile = board.tile(for: coordinate) {
             board.eatCookie(at: tile)
+            viewModel = GameViewModel(heroPosition: coordinate)
         }
-        
-        viewModel = GameViewModel(heroPosition: coordinate)
     }
     
     func output() -> GameViewModel {
@@ -370,9 +385,6 @@ struct GameViewModel: Equatable {
 
 /*
  Issues / Refactoring stuff:
-    Make `canHeroMove(heroCoordinate:` methos easy to read and simple
- Calling `self.consumeCookieIfPossible(tile: tile)` in 287 line, not a single responsability method
- Tile isWallTile and isCookie coud be part of an enum
  Having a method to create the board and not having all in the init
  Move the boardSize property in board and use the constant or something different to make it cleaner
  Replace at index instead of creating a new area in `eatCookie` method
