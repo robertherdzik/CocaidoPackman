@@ -390,11 +390,12 @@ struct GameViewModel: Equatable {
 /*
  Issues / Refactoring stuff:
 
- Replace at index instead of creating a new area in `eatCookie` method
- Can we remove Hero struct or refactor it?
+ - Replace at index instead of creating a new area in `eatCookie` method
+ - Can we remove Hero struct or refactor it?
+ - Add acceptance test: e.g. move from A (0, 0) to point B (3, 4)
  
  Tasks for a future:
- We should look for the score in the game instead of counting cookies
+ - We should look for the score in the game instead of counting cookies
  `func cookiesTilesInBoardCount() -> Int` should not be part of the game
  */
 
