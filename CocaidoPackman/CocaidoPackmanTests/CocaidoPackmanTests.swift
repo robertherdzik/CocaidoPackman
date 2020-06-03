@@ -4,7 +4,7 @@ import XCTest
 class CocaidoPackmanTests: XCTestCase {
 
     func testMoveHeroToRight() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .right)
@@ -14,7 +14,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToLeft() {
-        let hero = Hero(position: .init(x: 1, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 1, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .left)
@@ -24,7 +24,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToUp() {
-        let hero = Hero(position: .init(x: 0, y: 1))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 1)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .up)
@@ -34,7 +34,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToDown() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .down)
@@ -44,7 +44,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToUpDoesNotGoOutOfBounds() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .up)
@@ -54,7 +54,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToLeftDoesNotGoOutOfBounds() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .left)
@@ -64,7 +64,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToDownDoesNotGoOutOfBounds() {
-        let hero = Hero(position: .init(x: 9, y: 9))
+        let hero = Hero(position: .init(coordinate: .init(x: 9, y: 9)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .down)
@@ -74,7 +74,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToRightDoesNotGoOutOfBounds() {
-        let hero = Hero(position: .init(x: 9, y: 9))
+        let hero = Hero(position: .init(coordinate: .init(x: 9, y: 9)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .right)
@@ -84,7 +84,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToLeftDoesNotGoThroughWall() {
-        let hero = Hero(position: .init(x: 2, y: 2))
+        let hero = Hero(position: .init(coordinate: .init(x: 2, y: 2)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .left)
@@ -94,7 +94,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToRightDoesNotGoThroughWall() {
-        let hero = Hero(position: .init(x: 0, y: 1))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 1)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .right)
@@ -104,7 +104,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToUpDoesNotGoThroughWall() {
-        let hero = Hero(position: .init(x: 1, y: 4))
+        let hero = Hero(position: .init(coordinate: .init(x: 1, y: 4)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .up)
@@ -114,7 +114,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToDownDoesNotGoThroughWall() {
-        let hero = Hero(position: .init(x: 1, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 1, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .down)
@@ -124,7 +124,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToLeftDoesGoBehindBounds() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .left)
@@ -134,7 +134,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroToRightDoesGoBehindBounds() {
-        let hero = Hero(position: .init(x: 9, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 9, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .right)
@@ -144,7 +144,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroDownDoesGoBehindBounds() {
-        let hero = Hero(position: .init(x: 0, y: 9))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 9)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .down)
@@ -154,7 +154,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testMoveHeroUpDoesGoBehindBounds() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         
         sut.moveHero(direction: .up)
@@ -170,7 +170,7 @@ class CocaidoPackmanTests: XCTestCase {
     }
     
     func testHeroCanEatCookies() {
-        let hero = Hero(position: .init(x: 0, y: 0))
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
         let sut = Game(hero: hero)
         let cookiesTilesCountBeforeMovement = sut.cookiesTilesInBoardCount()
 
@@ -186,10 +186,12 @@ class CocaidoPackmanTests: XCTestCase {
 struct Tile: Equatable {
     var isWallTile = false
     var isCookie = false
-    let x, y: Int
+    let coordinate: Coordinate
     
     func eat() -> Tile {
-        Tile(isWallTile: isWallTile, isCookie: false, x: x, y: y)
+        Tile(isWallTile: isWallTile,
+             isCookie: false,
+             coordinate: coordinate)
     }
 }
 
@@ -222,7 +224,7 @@ struct Board {
     }
     
     private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
-        var tile = Tile(x: coordinate.x, y: coordinate.y)
+        var tile = Tile(coordinate: coordinate)
         tile.isWallTile = wallCoordinates.contains(coordinate)
         tile.isCookie = !tile.isWallTile
         
@@ -257,7 +259,7 @@ class Game {
         self.hero = hero
         self.board = board
         let heroPosition = hero.position
-        viewModel = GameViewModel(heroPosition: .init(x: heroPosition.x, y: heroPosition.y))
+        viewModel = GameViewModel(heroPosition: heroPosition.coordinate)
     }
     
     private func moveTo(_ direction: Direction) -> Coordinate {
@@ -281,13 +283,12 @@ class Game {
         }
         
         return board.filteringTiles { tile in
-            if tile.x == action(tile, boundIndex).x
-                && tile.y == action(tile, boundIndex).y {
+            if tile.coordinate == action(tile, boundIndex) {
                 self.consumeCookieIfPossible(tile: tile)
                 return true
             }
             return false
-        }.map { Coordinate(x: $0.x, y: $0.y) }.first ?? coordinate
+        }.map { $0.coordinate }.first ?? coordinate
     }
     
     private func consumeCookieIfPossible(tile: Tile) {
@@ -359,7 +360,6 @@ struct GameViewModel: Equatable {
  Issues / Refactoring stuff:
     Make `canHeroMove(heroCoordinate:` methos easy to read and simple
  Calling `self.consumeCookieIfPossible(tile: tile)` in 287 line, not a single responsability method
- Tile x and y position could be an coordinate values
  Tile isWallTile and isCookie coud be part of an enum
  Having a method to create the board and not having all in the init
  Move the boardSize property in board and use the constant or something different to make it cleaner
