@@ -195,16 +195,27 @@ struct Tile: Equatable {
     }
 }
 
+struct Bounds {
+    var minX: Int
+    var maxX: Int
+    var minY: Int
+    var maxY: Int
+}
+
 struct Board {
     private var area: [Tile]
     enum Constant {
         static let boardSize = BoardSize(width: 10, height: 10)
     }
     private let boardSize = Constant.boardSize
-    var minX: Int { 0 }
-    var maxX: Int { boardSize.width }
-    var minY: Int { 0 }
-    var maxY: Int { boardSize.height }
+    
+    var bounds: Bounds {
+        Bounds(minX: 0, maxX: boardSize.width, minY: 0, maxY: boardSize.height)
+    }
+//    var minX: Int { 0 }
+//    var maxX: Int { bounds. }
+//    var minY: Int { 0 }
+//    var maxY: Int { boardSize.height }
     var cookiesTilesCount: Int { area.filter { $0.isCookie }.count }
     var tilesCount: Int { area.count }
     var wallTilesCount: Int { area.filter { $0.isWallTile }.count }
@@ -264,35 +275,26 @@ class Game {
     
     private func moveTo(_ direction: Direction) -> Coordinate {
         let coordinate = viewModel.heroPosition
-        let action: (Tile, Int) -> Coordinate
-        let boundIndex: Int
+        let action: (Tile, Bounds) -> Coordinate
         
         switch direction {
         case .up:
             action = coordinate.moveUp
-            boundIndex = board.minY
         case .down:
             action = coordinate.moveDown
-            boundIndex = board.maxY
         case .left:
             action = coordinate.moveLeft
-            boundIndex = board.minX
         case .right:
             action = coordinate.moveRight
-            boundIndex = board.maxX
         }
         
         return board.filteringTiles { tile in
-            if tile.coordinate == action(tile, boundIndex) {
-                self.consumeCookieIfPossible(tile: tile)
+            if tile.coordinate == action(tile, board.bounds) {
+                board.eatCookie(at: tile)
                 return true
             }
             return false
         }.map { $0.coordinate }.first ?? coordinate
-    }
-    
-    private func consumeCookieIfPossible(tile: Tile) {
-        board.eatCookie(at: tile)
     }
     
     func moveHero(direction: Direction) {
@@ -312,6 +314,8 @@ class Game {
 
 enum Direction {
     case up, down, left, right
+    
+//    func xxx() ->
 }
 
 struct Hero {
@@ -323,29 +327,29 @@ struct Hero {
 struct Coordinate: Equatable {
     var x, y: Int
     
-    func moveUp(from tileAboveOfPos: Tile, boundIndex: Int) -> Coordinate {
-        if y != boundIndex && !tileAboveOfPos.isWallTile {
+    func moveUp(from tileAboveOfPos: Tile, bounds: Bounds) -> Coordinate {
+        if y != bounds.minY && !tileAboveOfPos.isWallTile {
             return Coordinate(x: x, y: y - 1)
         }
         return self
     }
     
-    func moveDown(from tileBelowOfPos: Tile, boundIndex: Int) -> Coordinate {
-        if y < boundIndex && !tileBelowOfPos.isWallTile {
+    func moveDown(from tileBelowOfPos: Tile, bounds: Bounds) -> Coordinate {
+        if y < bounds.maxY && !tileBelowOfPos.isWallTile {
             return Coordinate(x: x, y: y + 1)
         }
         return self
     }
     
-    func moveLeft(from tileLeftOfPos: Tile, boundIndex: Int) -> Coordinate {
-        if x != boundIndex && !tileLeftOfPos.isWallTile {
+    func moveLeft(from tileLeftOfPos: Tile, bounds: Bounds) -> Coordinate {
+        if x != bounds.minX && !tileLeftOfPos.isWallTile {
             return Coordinate(x: x - 1, y: y)
         }
         return self
     }
     
-    func moveRight(from tileRightOfPos: Tile, boundIndex: Int) -> Coordinate {
-        if x < boundIndex && !tileRightOfPos.isWallTile {
+    func moveRight(from tileRightOfPos: Tile, bounds: Bounds) -> Coordinate {
+        if x < bounds.maxX && !tileRightOfPos.isWallTile {
             return Coordinate(x: x + 1, y: y)
         }
         return self
