@@ -262,34 +262,32 @@ class Game {
     
     private func moveTo(_ direction: Direction) -> Coordinate {
         let coordinate = viewModel.heroPosition
+        let action: (Tile, Int) -> Coordinate
+        let boundIndex: Int
         
         switch direction {
         case .up:
-            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveUp)
-            return usecase(board, board.minY) ?? coordinate
+            action = coordinate.moveUp
+            boundIndex = board.minY
         case .down:
-            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveDown)
-            return usecase(board, board.maxY) ?? coordinate
+            action = coordinate.moveDown
+            boundIndex = board.maxY
         case .left:
-            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveLeft)
-            return usecase(board, board.minX) ?? coordinate
+            action = coordinate.moveLeft
+            boundIndex = board.minX
         case .right:
-            let usecase = canHeroMove(heroCoordinate: coordinate, action: coordinate.moveRight)
-            return usecase(board, board.maxX) ?? coordinate
+            action = coordinate.moveRight
+            boundIndex = board.maxX
         }
-    }
-    
-    private func canHeroMove(heroCoordinate: Coordinate,
-                             action: @escaping (Tile, _ boundIndex: Int) -> Coordinate) -> (Board, _ boundIndex: Int) -> Coordinate? {
-        return { board, boundIndex in
-            return board.filteringTiles { tile in
-                if tile.x == action(tile, boundIndex).x && tile.y == action(tile, boundIndex).y {
-                    self.consumeCookieIfPossible(tile: tile)
-                    return true
-                }
-                return false
-            }.map { Coordinate(x: $0.x, y: $0.y) }.first
-        }
+        
+        return board.filteringTiles { tile in
+            if tile.x == action(tile, boundIndex).x
+                && tile.y == action(tile, boundIndex).y {
+                self.consumeCookieIfPossible(tile: tile)
+                return true
+            }
+            return false
+        }.map { Coordinate(x: $0.x, y: $0.y) }.first ?? coordinate
     }
     
     private func consumeCookieIfPossible(tile: Tile) {
@@ -358,15 +356,8 @@ struct GameViewModel: Equatable {
 }
 
 /*
- Board
- -
- 
- Packman
- - move up/down/right/left
- - position
- 
  Issues / Refactoring stuff:
- Make `canHeroMove(heroCoordinate:` methos easy to read and simple
+    Make `canHeroMove(heroCoordinate:` methos easy to read and simple
  Calling `self.consumeCookieIfPossible(tile: tile)` in 287 line, not a single responsability method
  Tile x and y position could be an coordinate values
  Tile isWallTile and isCookie coud be part of an enum
@@ -378,6 +369,5 @@ struct GameViewModel: Equatable {
  Tasks for a future:
  We should look for the score in the game instead of counting cookies
  `func cookiesTilesInBoardCount() -> Int` should not be part of the game
- 
  */
 
