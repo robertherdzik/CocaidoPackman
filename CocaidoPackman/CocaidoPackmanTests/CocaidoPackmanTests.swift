@@ -212,10 +212,6 @@ struct Board {
     var bounds: Bounds {
         Bounds(minX: 0, maxX: boardSize.width, minY: 0, maxY: boardSize.height)
     }
-//    var minX: Int { 0 }
-//    var maxX: Int { bounds. }
-//    var minY: Int { 0 }
-//    var maxY: Int { boardSize.height }
     var cookiesTilesCount: Int { area.filter { $0.isCookie }.count }
     var tilesCount: Int { area.count }
     var wallTilesCount: Int { area.filter { $0.isWallTile }.count }
@@ -275,7 +271,7 @@ class Game {
     
     private func moveTo(_ direction: Direction) -> Coordinate {
         let coordinate = viewModel.heroPosition
-        let action: (Tile, Bounds) -> Coordinate
+        let action: (Bool, Bounds) -> Coordinate
         
         switch direction {
         case .up:
@@ -289,7 +285,7 @@ class Game {
         }
         
         return board.filteringTiles { tile in
-            if tile.coordinate == action(tile, board.bounds) {
+            if tile.coordinate == action(tile.isWallTile, board.bounds) {
                 board.eatCookie(at: tile)
                 return true
             }
@@ -327,29 +323,29 @@ struct Hero {
 struct Coordinate: Equatable {
     var x, y: Int
     
-    func moveUp(from tileAboveOfPos: Tile, bounds: Bounds) -> Coordinate {
-        if y != bounds.minY && !tileAboveOfPos.isWallTile {
+    func moveUp(isWallTile: Bool, bounds: Bounds) -> Coordinate {
+        if y != bounds.minY && !isWallTile {
             return Coordinate(x: x, y: y - 1)
         }
         return self
     }
     
-    func moveDown(from tileBelowOfPos: Tile, bounds: Bounds) -> Coordinate {
-        if y < bounds.maxY && !tileBelowOfPos.isWallTile {
+    func moveDown(isWallTile: Bool, bounds: Bounds) -> Coordinate {
+        if y < bounds.maxY && !isWallTile {
             return Coordinate(x: x, y: y + 1)
         }
         return self
     }
     
-    func moveLeft(from tileLeftOfPos: Tile, bounds: Bounds) -> Coordinate {
-        if x != bounds.minX && !tileLeftOfPos.isWallTile {
+    func moveLeft(isWallTile: Bool, bounds: Bounds) -> Coordinate {
+        if x != bounds.minX && !isWallTile {
             return Coordinate(x: x - 1, y: y)
         }
         return self
     }
     
-    func moveRight(from tileRightOfPos: Tile, bounds: Bounds) -> Coordinate {
-        if x < bounds.maxX && !tileRightOfPos.isWallTile {
+    func moveRight(from isWallTile: Bool, bounds: Bounds) -> Coordinate {
+        if x < bounds.maxX && !isWallTile {
             return Coordinate(x: x + 1, y: y)
         }
         return self
