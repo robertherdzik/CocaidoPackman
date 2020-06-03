@@ -242,6 +242,10 @@ struct Board {
         area.filter(filter)
     }
     
+    func tile(for coordinate:  Coordinate) -> Tile? {
+        area.first { $0.coordinate == coordinate }
+    }
+    
     mutating func eatCookie(at tile: Tile) {
         var area = self.area
         guard tile.isCookie, let tileToReplace = area.filter({ $0 == tile }).first, let index = area.firstIndex(of: tileToReplace) else {
@@ -269,34 +273,26 @@ class Game {
         viewModel = GameViewModel(heroPosition: heroPosition.coordinate)
     }
     
+   
+    
     private func moveTo(_ direction: Direction) -> Coordinate {
         let coordinate = viewModel.heroPosition
-        let action: (Bool, Bounds) -> Coordinate
+        let coordinateAction = coordinate.moveAction(direction: direction,
+                                                     bounds: board.bounds)
         
-        switch direction {
-        case .up:
-            action = coordinate.moveUp
-        case .down:
-            action = coordinate.moveDown
-        case .left:
-            action = coordinate.moveLeft
-        case .right:
-            action = coordinate.moveRight
-        }
-        
-        return board.filteringTiles { tile in
-            if tile.coordinate == action(tile.isWallTile, board.bounds) {
-                board.eatCookie(at: tile)
-                return true
-            }
-            return false
+        return board.filteringTiles {
+            $0.coordinate == coordinateAction($0.isWallTile, board.bounds)
         }.map { $0.coordinate }.first ?? coordinate
     }
     
     func moveHero(direction: Direction) {
         let coordinate = moveTo(direction)
-        let localViewModel = GameViewModel(heroPosition: coordinate)
-        viewModel = localViewModel
+        
+        if let tile = board.tile(for: coordinate) {
+            board.eatCookie(at: tile)
+        }
+        
+        viewModel = GameViewModel(heroPosition: coordinate)
     }
     
     func output() -> GameViewModel {
@@ -310,8 +306,6 @@ class Game {
 
 enum Direction {
     case up, down, left, right
-    
-//    func xxx() ->
 }
 
 struct Hero {
@@ -349,6 +343,24 @@ struct Coordinate: Equatable {
             return Coordinate(x: x + 1, y: y)
         }
         return self
+    }
+    
+    typealias MoveAction = (_ isWallTile: Bool, _ boardBounds: Bounds) -> Coordinate
+    func moveAction(direction: Direction, bounds: Bounds) -> MoveAction {
+        let action: (Bool, Bounds) -> Coordinate
+        
+        switch direction {
+        case .up:
+            action = moveUp
+        case .down:
+            action = moveDown
+        case .left:
+            action = moveLeft
+        case .right:
+            action = moveRight
+        }
+        
+        return action
     }
 }
 
