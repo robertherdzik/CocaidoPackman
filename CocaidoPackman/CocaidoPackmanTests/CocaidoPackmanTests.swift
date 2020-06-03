@@ -235,23 +235,8 @@ struct Board {
     init(wallCoordinates: [Coordinate] = [Coordinate(x: 1, y: 1),
                                           Coordinate(x: 1, y: 2),
                                           Coordinate(x: 1, y: 3)]) {
-        var tiles = [Tile]()
-        for xIndex in 0..<Constant.boardSize.width {
-            for yIndex in 0..<Constant.boardSize.height {
-                let tile = Board.tile(for: .init(x: xIndex, y: yIndex), wallCoordinates: wallCoordinates)
-                tiles.append(tile)
-            }
-        }
         
-        self.area = tiles
-    }
-    
-    private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
-        if wallCoordinates.contains(coordinate) {
-            return Tile(type: .wall, coordinate: coordinate)
-        }
-        
-        return Tile(type: .cookie, coordinate: coordinate)
+        self.area = Board.make(wallCoordinates: wallCoordinates)
     }
     
     func filteringTiles(_ filter: (Tile) -> Bool) -> [Tile] {
@@ -269,6 +254,27 @@ struct Board {
         }
         area[index] = tileToReplace.eat()
         self.area = area
+    }
+    
+    static private func make(wallCoordinates: [Coordinate]) -> [Tile] {
+        var tiles = [Tile]()
+        for xIndex in 0..<Constant.boardSize.width {
+            for yIndex in 0..<Constant.boardSize.height {
+                let tile = Board.tile(for: .init(x: xIndex, y: yIndex),
+                                      wallCoordinates: wallCoordinates)
+                tiles.append(tile)
+            }
+        }
+        
+        return tiles
+    }
+    
+    private static func tile(for coordinate: Coordinate, wallCoordinates: [Coordinate]) -> Tile {
+        if wallCoordinates.contains(coordinate) {
+            return Tile(type: .wall, coordinate: coordinate)
+        }
+        
+        return Tile(type: .cookie, coordinate: coordinate)
     }
 }
 
@@ -385,7 +391,7 @@ struct GameViewModel: Equatable {
 
 /*
  Issues / Refactoring stuff:
- Having a method to create the board and not having all in the init
+ 
  Move the boardSize property in board and use the constant or something different to make it cleaner
  Replace at index instead of creating a new area in `eatCookie` method
  Can we remove Hero struct or refactor it?
