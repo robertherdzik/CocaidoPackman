@@ -178,6 +178,19 @@ class CocaidoPackmanTests: XCTestCase {
         let cookiesTilesCountAfterMovement = sut.cookiesTilesInBoardCount()
         XCTAssertEqual(cookiesTilesCountBeforeMovement - 1, cookiesTilesCountAfterMovement)
     }
+    
+    func testHeroCanEatCookiesx() {
+        let hero = Hero(position: .init(coordinate: .init(x: 0, y: 0)))
+        let sut = Game(hero: hero)
+        let cookiesTilesCountBeforeMovement = sut.cookiesTilesInBoardCount()
+
+        sut.moveHero(direction: .right)
+        sut.moveHero(direction: .right)
+//        sut.moveHero(direction: .down)
+//        sut.moveHero(direction: .down)
+        let cookiesTilesCountAfterMovement = sut.cookiesTilesInBoardCount()
+        XCTAssertEqual(cookiesTilesCountBeforeMovement - 2, cookiesTilesCountAfterMovement)
+    }
 }
 
 //------------------------------------------------
@@ -253,12 +266,15 @@ struct Board {
     }
     
     mutating func eatCookie(at tile: Tile) {
-        var area = self.area
         guard tile.isCookie, let tileToReplace = area.filter({ $0 == tile }).first, let index = area.firstIndex(of: tileToReplace) else {
             return
         }
-        area[index] = tileToReplace.eat()
-        self.area = area
+
+        xxx(tile: tileToReplace, index: index)
+    }
+    
+    mutating func xxx(tile: Tile, index: Int) {
+        area[index] = tile.eat()
     }
     
     static private func make(wallCoordinates: [Coordinate]) -> [Tile] {
